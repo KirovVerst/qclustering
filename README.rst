@@ -6,6 +6,29 @@ Library of popular algorithms implemented in a parallel way
 
 |travis| |license|
 
+------------
+Requirements
+------------
+
+Python 3.6
+
+-------
+Install
+-------
+
+.. code:: bash
+
+    (venv)$ pip install -r requirements.txt
+
+----
+Test
+----
+
+.. code:: bash
+
+    (venv)$ flake8
+    (venv)$ py.test
+
 ---------
 Licensing
 ---------
