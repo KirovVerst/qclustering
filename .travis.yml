@@ -1,7 +1,17 @@
 language: python
 python:
   - "3.6"
+
 install:
   - pip install -r requirements-test.txt
+  - pip install coveralls
+
 script:
   - flake8
+  - coverage run --source=. -m py.test
+
+after_success:
+  coveralls
+
+notifications:
+  email: false
