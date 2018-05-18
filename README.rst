@@ -4,7 +4,7 @@ QParallel
 
 Library of popular algorithms implemented in a parallel way
 
-|travis| |license|
+|travis| |coveralls| |license|
 
 ------------
 Requirements
@@ -41,3 +41,5 @@ The code in this project is licensed under MIT license.
 .. |travis| image:: https://travis-ci.com/KirovVerst/qparallel.svg?branch=master
     :target: https://travis-ci.com/KirovVerst/qparallel
     :alt: CI status
+.. |coveralls| image:: https://coveralls.io/repos/github/KirovVerst/qparallel/badge.svg?branch=master
+    :target: https://coveralls.io/github/KirovVerst/qparallel?branch=master
