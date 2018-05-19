@@ -1,7 +1,19 @@
 language: python
+
 python:
   - "3.6"
+
 install:
-  - pip install -r requirements-test.txt
+  - pip install -r requirements.txt
+  - pip install coveralls
+  - pip install pytest-cov
+
 script:
   - flake8
+  - coverage run --source=. -m py.test
+
+after_success:
+  coveralls
+
+notifications:
+  email: false
