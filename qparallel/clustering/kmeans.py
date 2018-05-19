@@ -14,6 +14,7 @@ _METRICS = ['euclidean', 'l2', 'l1', 'manhattan', 'cityblock',
 """
 
 
+
 def _init():
     return centers
 
