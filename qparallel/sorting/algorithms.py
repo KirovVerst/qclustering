@@ -9,8 +9,8 @@ from qparallel.helpers import (
 
 
 class AbstractSorting:
-    def __init__(self, ascending=True):
-        self.ascending = ascending
+    def __init__(self, **kwargs):
+        self.ascending = kwargs.get('ascending', True)
 
         def ascending_comp(x, y):
             return x < y
@@ -18,7 +18,7 @@ class AbstractSorting:
         def decreasing_comp(x, y):
             return x > y
 
-        self.comparator = ascending_comp if ascending else decreasing_comp
+        self.comparator = ascending_comp if self.ascending else decreasing_comp
 
     def _sort_one_array(self, array):
         raise NotImplementedError
@@ -69,17 +69,22 @@ class AbstractSorting:
         array = list(array)
         return self._sort_one_array(array)
 
+    def sort_arrays(self, arrays, cpu_count):
+        with Pool(cpu_count) as pool:
+            sorted_arrays = pool.map(self._sort_one_array, arrays)
+
+        return sorted_arrays
+
     def sort(self, array, cpu_count=-1):
         array = list(array)
         cpu_count = get_available_cpu_count(cpu_count)
-        chunks = split_data(array, cpu_count)
+        arrays = split_data(array, cpu_count)
 
-        with Pool(cpu_count) as pool:
-            sorted_arrays = pool.map(self._sort_one_array, chunks)
+        sorted_arrays = self.sort_arrays(arrays, cpu_count)
 
-        sorted_arrays = self.merge_sorted_arrays(sorted_arrays, cpu_count)
+        merged_arrays = self.merge_sorted_arrays(sorted_arrays, cpu_count)
 
-        return sorted_arrays[0]
+        return merged_arrays[0]
 
 
 class MergeSorting(AbstractSorting):
