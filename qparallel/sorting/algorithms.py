@@ -66,9 +66,11 @@ class AbstractSorting:
         return merged_array
 
     def sort_one_array(self, array):
+        array = list(array)
         return self._sort_one_array(array)
 
     def sort(self, array, cpu_count=-1):
+        array = list(array)
         cpu_count = get_available_cpu_count(cpu_count)
         chunks = split_data(array, cpu_count)
 
@@ -83,6 +85,7 @@ class AbstractSorting:
 class MergeSorting(AbstractSorting):
     def _sort_one_array(self, array):
         array = list(array)
+
         array_size = len(array)
 
         if len(array) <= 1:
@@ -92,3 +95,50 @@ class MergeSorting(AbstractSorting):
         array_2 = self._sort_one_array(array[array_size // 2:])
 
         return self.merge_two_sorted_arrays((array_1, array_2))
+
+
+class SelectSorting(AbstractSorting):
+    def _sort_one_array(self, array):
+        array = list(array)
+
+        selector = min if self.ascending else max
+
+        for i in range(len(array)):
+            index = i + array[i:].index(selector(array[i:]))
+            array[index], array[i] = array[i], array[index]
+
+        return array
+
+
+class QuickSorting(AbstractSorting):
+    def _partition(self, array, left, right):
+        value = array[(left + right) // 2]
+
+        while left <= right:
+            while self.comparator(array[left], value):
+                left += 1
+
+            while self.comparator(value, array[right]):
+                right -= 1
+
+            if left <= right:
+                array[left], array[right] = array[right], array[left]
+                left += 1
+                right -= 1
+
+        return left
+
+    def _quicksort(self, array, left, right):
+        if len(array) <= 1:
+            return array
+
+        if left < right:
+            index = self._partition(array, left, right)
+            self._quicksort(array, left, index - 1)
+            self._quicksort(array, index, right)
+
+    def _sort_one_array(self, array):
+        array = list(array)
+
+        self._quicksort(array, 0, len(array) - 1)
+        return array

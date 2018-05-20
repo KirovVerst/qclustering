@@ -45,3 +45,25 @@ def test_merge_sort(array, ascending, monkeypatch):
 
     run_sort_one_array(MergeSorting, array, ascending)
     run_sort_array(MergeSorting, array, ascending)
+
+
+@pytest.mark.parametrize('array', ARRAYS)
+@pytest.mark.parametrize('ascending', [ASCENDING, DECREASING])
+def test_select_sort(array, ascending, monkeypatch):
+    monkeypatch.setattr('multiprocessing.cpu_count', lambda: DEFAULT_CPU_COUNT)
+
+    from qparallel.sorting import SelectSorting
+
+    run_sort_one_array(SelectSorting, array, ascending)
+    run_sort_array(SelectSorting, array, ascending)
+
+
+@pytest.mark.parametrize('array', ARRAYS)
+@pytest.mark.parametrize('ascending', [ASCENDING, DECREASING])
+def test_quick_sort(array, ascending, monkeypatch):
+    monkeypatch.setattr('multiprocessing.cpu_count', lambda: DEFAULT_CPU_COUNT)
+
+    from qparallel.sorting import QuickSorting
+
+    run_sort_one_array(QuickSorting, array, ascending)
+    run_sort_array(QuickSorting, array, ascending)
