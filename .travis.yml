@@ -13,7 +13,7 @@ script:
   - coverage run --source=. -m py.test
 
 after_success:
-  coveralls
+  COVERALLS_REPO_TOKEN=$COVERALLS_REPO_TOKEN coveralls
 
 notifications:
   email: false
