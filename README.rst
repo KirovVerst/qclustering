@@ -20,6 +20,22 @@ Install
 
     (venv)$ pip install -r requirements.txt
 
+--------
+Examples
+--------
+**Sorting algorithms** 
+
+.. code:: python
+    
+    from random import random
+    from qparallel.sorting import MergeSorting
+    
+    array = [random() for _ in range(100)]
+    
+    assert MergeSorting(ascending=True).sort(array, cpu_count=2) == sorted(array)
+    assert MergeSorting(ascending=False).sort(array, cpu_count=2) == sorted(array, reverse=True)
+
+
 ----
 Test
 ----
