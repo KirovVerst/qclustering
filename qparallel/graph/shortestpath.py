@@ -14,19 +14,6 @@ nodes are counted from 0
 """
 
 
-def chunks_with_indixes(data, n_proc):
-    inx = [i for i in range(len(data))]
-    inx = split_data(inx, n_proc)
-    chunks = split_data(data, n_proc)
-    for i in range(len(chunks)):
-        tmp = np.zeros(shape=(len(data)))
-        for j in inx[i]:
-            tmp[j] = 1
-        chunks[i] = np.append(chunks[i], [tmp], axis=0)
-        print(chunks[1])
-    return chunks
-
-
 class Graph:
 
     def __init__(self, x, n_proc=1):
@@ -45,25 +32,39 @@ class Graph:
     def process_distances(self):
         raise NotImplementedError
 
+    def _shortest(self, chunk):
+        for k in range(chunk.shape[0]):
+            for i in range(chunk.shape[0]):
+                for j in range(self.num_nodes):
+                    chunk[i, j] = min(chunk[i, j], chunk[i, k] + chunk[k, j])
+        return np.array(chunk)
+
     def find_shortest_path(self):
         """
         Parallel Floyd's algorithm
         """
-        self._I = np.zeros(shape=(self.num_nodes, self.num_nodes))
-        chunks = split_data(self._adjacency_matrix, self.n_proc)
-        chunks = chunks_with_indixes(self._adjacency_matrix, self.n_proc)
-        print(chunks)
+        I = self._adjacency_matrix.copy()
+        I[I == 0] = np.inf
+        ind = np.array([i for i in range(self.num_nodes)])
+        ind = split_data(ind, self.n_proc)
+        chunks = split_data(I, self.n_proc)
         with Pool(self.n_proc) as pool:
-            pass
+            res = list(pool.map(self._shortest, chunks))
+        com_res = res[0]
+        for i in range(1,len(res)):
+            com_res = np.append(com_res, res[i],axis=0)
+        return com_res
 
-    # for k in range(n_proc-1):
-    #     for i in range()
-    # pass
+    def _convert_to_dict(self):
+        pass
 
     def color_graph(self):
+
         raise NotImplementedError
 
 
-graph = Graph([[0, 5], [1, 2], [2, 3], [3, 4]], n_proc=5)
-print(graph._adjacency_matrix)
-graph.find_shortest_path()
+if __name__ == "__main__":
+    graph = Graph([[0, 5], [1, 2], [2, 3], [3, 4], [5, 0], [2, 1], [3, 2], [4, 3], [3, 0], [0, 3]], n_proc=2)
+    print(graph._adjacency_matrix)
+    print(graph.find_shortest_path())
+
