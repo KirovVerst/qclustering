@@ -1,9 +1,9 @@
 __author__ = 'Azat Abubakirov'
 
-
 from qparallel.experiments.logger import AbstractEvaluator, Record
 from qparallel.sorting import (
     AbstractSorting,
+    BlockSorting,
     MergeSorting,
     SelectSorting,
     QuickSorting
@@ -58,3 +58,7 @@ class QuickSortingEvaluator(QuickSorting, AbstractSortingEvaluator):
 
 class SelectSortingEvaluator(SelectSorting, AbstractSortingEvaluator):
     algorithm_name = 'select_sorting'
+
+
+class BlockSortingEvaluator(BlockSorting, AbstractSortingEvaluator):
+    algorithm_name = 'block_sorting'

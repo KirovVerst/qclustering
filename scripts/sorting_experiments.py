@@ -2,6 +2,7 @@ __author__ = 'Azat Abubakirov'
 
 import os
 from qparallel.experiments.sorting import (
+    BlockSortingEvaluator,
     MergeSortingEvaluator,
     SelectSortingEvaluator,
     SortingRecord
@@ -12,7 +13,11 @@ from scripts.config import RESULTS_DIR_PATH
 if __name__ == '__main__':
     configurations = [{'array': list(range(10000)), 'cpu_count': 2}]
     iterations = 10
-    evaluators = [SelectSortingEvaluator(ascending=False), MergeSortingEvaluator(ascending=False)]
+    evaluators = [
+        BlockSortingEvaluator(ascending=False),
+        SelectSortingEvaluator(ascending=False),
+        MergeSortingEvaluator(ascending=False)
+    ]
     logger = Logger(
         csv_file_path=os.path.join(RESULTS_DIR_PATH, 'sorting.csv'),
         evaluators=evaluators,

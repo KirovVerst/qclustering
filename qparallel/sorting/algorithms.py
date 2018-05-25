@@ -1,24 +1,29 @@
 __author__ = 'Azat Abubakirov'
 
+from itertools import chain
+
 from pathos.multiprocessing import ProcessPool as Pool
 
 from qparallel.helpers import (
     get_available_cpu_count,
+    roundup,
     split_data
 )
 
 
 class AbstractSorting:
+    @staticmethod
+    def ascending_comparator(x, y):
+        return x < y
+
+    @staticmethod
+    def decreasing_comparator(x, y):
+        return y < x
+
     def __init__(self, **kwargs):
         self.ascending = kwargs.get('ascending', True)
 
-        def ascending_comp(x, y):
-            return x < y
-
-        def decreasing_comp(x, y):
-            return x > y
-
-        self.comparator = ascending_comp if self.ascending else decreasing_comp
+        self.comparator = self.ascending_comparator if self.ascending else self.decreasing_comparator
 
     def _sort_one_array(self, array):
         raise NotImplementedError
@@ -75,10 +80,16 @@ class AbstractSorting:
 
         return sorted_arrays
 
+    def _split_array(self, array, cpu_count):
+        return split_data(array, cpu_count)
+
     def sort(self, array, cpu_count=-1):
+        if not array:
+            return []
+
         array = list(array)
         cpu_count = get_available_cpu_count(cpu_count)
-        arrays = split_data(array, cpu_count)
+        arrays = self._split_array(array, cpu_count)
 
         sorted_arrays = self.sort_arrays(arrays, cpu_count)
 
@@ -147,3 +158,41 @@ class QuickSorting(AbstractSorting):
 
         self._quicksort(array, 0, len(array) - 1)
         return array
+
+
+class BlockSorting(AbstractSorting):
+    @classmethod
+    def _split_array(cls, array, cpu_count=-1, **kwargs):
+        step = kwargs.get('step', 10)
+
+        max_value = roundup(max(array), step)
+        min_value = roundup(min(array), step)
+
+        borders = list(range(min_value, max_value, step))
+        arrays = [[] for _ in range((max_value - min_value) // step + 1)]
+
+        for value in array:
+            added = False
+            for i, border in enumerate(borders):
+                if value <= border:
+                    arrays[i].append(value)
+                    added = True
+                    break
+            if not added:
+                arrays[-1].append(value)
+        return arrays
+
+    def merge_sorted_arrays(self, sorted_arrays, cpu_count):
+        if not self.ascending:
+            sorted_arrays = list(reversed(sorted_arrays))
+        return [list(chain(*sorted_arrays))]
+
+    def _sort_one_array(self, array):
+        if not array:
+            return []
+
+        arrays = self._split_array(array, step=1)
+        if not self.ascending:
+            arrays = list(reversed(arrays))
+
+        return list(chain(*arrays))
