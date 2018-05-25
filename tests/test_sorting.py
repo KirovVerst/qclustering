@@ -12,6 +12,8 @@ ARRAYS = [
 ]
 DEFAULT_CPU_COUNT = 2
 
+SORTING_CLASS_NAMES = ['MergeSorting', 'SelectSorting', 'QuickSorting', 'BlockSorting']
+
 
 @pytest.mark.parametrize('array_1, array_2, ascending, result', [
     (range(5), range(5, 10), ASCENDING, list(range(10))),
@@ -38,32 +40,21 @@ def run_sort_array(sorting_class, array, ascending):
 
 @pytest.mark.parametrize('array', ARRAYS)
 @pytest.mark.parametrize('ascending', [ASCENDING, DECREASING])
-def test_merge_sort(array, ascending, monkeypatch):
+@pytest.mark.parametrize('sorting_class_name', SORTING_CLASS_NAMES)
+def test_sorting(array, ascending, sorting_class_name, monkeypatch):
     monkeypatch.setattr('multiprocessing.cpu_count', lambda: DEFAULT_CPU_COUNT)
 
-    from qparallel.sorting import MergeSorting
+    import qparallel.sorting
 
-    run_sort_one_array(MergeSorting, array, ascending)
-    run_sort_array(MergeSorting, array, ascending)
-
-
-@pytest.mark.parametrize('array', ARRAYS)
-@pytest.mark.parametrize('ascending', [ASCENDING, DECREASING])
-def test_select_sort(array, ascending, monkeypatch):
-    monkeypatch.setattr('multiprocessing.cpu_count', lambda: DEFAULT_CPU_COUNT)
-
-    from qparallel.sorting import SelectSorting
-
-    run_sort_one_array(SelectSorting, array, ascending)
-    run_sort_array(SelectSorting, array, ascending)
+    sorting_class = getattr(qparallel.sorting, sorting_class_name)
+    run_sort_one_array(sorting_class, array, ascending)
+    run_sort_array(sorting_class, array, ascending)
 
 
-@pytest.mark.parametrize('array', ARRAYS)
-@pytest.mark.parametrize('ascending', [ASCENDING, DECREASING])
-def test_quick_sort(array, ascending, monkeypatch):
-    monkeypatch.setattr('multiprocessing.cpu_count', lambda: DEFAULT_CPU_COUNT)
-
-    from qparallel.sorting import QuickSorting
-
-    run_sort_one_array(QuickSorting, array, ascending)
-    run_sort_array(QuickSorting, array, ascending)
+@pytest.mark.parametrize('array, step, arrays', [
+    ([1, 2, 11, 12], 10, [[1, 2], [11, 12]]),
+    ([1, 1, 1, 1, 3], 1, [[1, 1, 1, 1], [], [3]])
+])
+def test_block_sort_split_data(array, step, arrays):
+    from qparallel.sorting.algorithms import BlockSorting
+    assert BlockSorting._split_array(array=array, step=step) == arrays

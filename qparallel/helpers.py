@@ -1,5 +1,6 @@
 __author__ = 'Azat Abubakirov'
 
+import math
 import multiprocessing
 
 
@@ -25,3 +26,7 @@ def split_data(data, chunks_count):
         left_border += current_chunk_size
 
     return chunks
+
+
+def roundup(x, step=10):
+    return int(math.ceil(x / step)) * step
