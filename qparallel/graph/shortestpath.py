@@ -55,16 +55,23 @@ class Graph:
             com_res = np.append(com_res, res[i],axis=0)
         return com_res
 
-    def _convert_to_dict(self):
+    def _coloring(self):
         pass
 
     def color_graph(self):
-
-        raise NotImplementedError
+        """
+        Jones-Plassmann Coloring
+        """
+        rand_assign = {}
+        nodes = self.data.flatten()
+        # len_nodes
+        # for i in range(len(set(nodes))):
+        #     random_assign[i] =
 
 
 if __name__ == "__main__":
     graph = Graph([[0, 5], [1, 2], [2, 3], [3, 4], [5, 0], [2, 1], [3, 2], [4, 3], [3, 0], [0, 3]], n_proc=2)
     print(graph._adjacency_matrix)
     print(graph.find_shortest_path())
+    print(graph.color_graph())
 
