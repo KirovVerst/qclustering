@@ -25,7 +25,7 @@ def test_merge_two_sorted_arrays(array_1, array_2, ascending, result):
 
     sorting = AbstractSorting(ascending=ascending)
 
-    assert sorting.merge_two_sorted_arrays((array_1, array_2)) == result
+    assert sorting.merge_two_sorted_arrays(array_1, array_2) == result
 
 
 def run_sort_one_array(sorting_class, array, ascending):
