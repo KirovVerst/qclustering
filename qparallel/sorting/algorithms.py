@@ -29,21 +29,17 @@ class AbstractSorting:
         raise NotImplementedError
 
     def merge_sorted_arrays(self, sorted_arrays, cpu_count):
-        while len(sorted_arrays) > 1:
-            if len(sorted_arrays) % 2 == 1:
-                sorted_arrays.append([])
+        result_array = sorted_arrays[0]
+        index = 1
+        sorted_arrays_count = len(sorted_arrays)
 
-            arrays_pairs = list(map(lambda i: (sorted_arrays[i], sorted_arrays[i + 1]),
-                                    range(0, len(sorted_arrays), 2)))
+        while index < sorted_arrays_count:
+            result_array = self.merge_two_sorted_arrays(result_array, sorted_arrays[index])
+            index += 1
 
-            with Pool(cpu_count) as pool:
-                sorted_arrays = list(pool.map(self.merge_two_sorted_arrays, arrays_pairs))
+        return result_array
 
-        return sorted_arrays
-
-    def merge_two_sorted_arrays(self, arrays):
-        array_1, array_2 = arrays[0], arrays[1]
-
+    def merge_two_sorted_arrays(self, array_1, array_2):
         merged_array = []
 
         index_1 = 0
@@ -93,9 +89,9 @@ class AbstractSorting:
 
         sorted_arrays = self.sort_arrays(arrays, cpu_count)
 
-        merged_arrays = self.merge_sorted_arrays(sorted_arrays, cpu_count)
+        merged_array = self.merge_sorted_arrays(sorted_arrays, cpu_count)
 
-        return merged_arrays[0]
+        return merged_array
 
 
 class MergeSorting(AbstractSorting):
@@ -110,7 +106,7 @@ class MergeSorting(AbstractSorting):
         array_1 = self._sort_one_array(array[:array_size // 2])
         array_2 = self._sort_one_array(array[array_size // 2:])
 
-        return self.merge_two_sorted_arrays((array_1, array_2))
+        return self.merge_two_sorted_arrays(array_1, array_2)
 
 
 class SelectSorting(AbstractSorting):
@@ -185,7 +181,7 @@ class BlockSorting(AbstractSorting):
     def merge_sorted_arrays(self, sorted_arrays, cpu_count):
         if not self.ascending:
             sorted_arrays = list(reversed(sorted_arrays))
-        return [list(chain(*sorted_arrays))]
+        return list(chain(*sorted_arrays))
 
     def _sort_one_array(self, array):
         if not array:
