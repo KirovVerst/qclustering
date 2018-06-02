@@ -21,9 +21,12 @@ class Record:
 
 class AbstractEvaluator:
     record_class = Record
+    algorithm_name = None
 
-    def _execute(self, **kwargs):
-        raise NotImplementedError
+    def _execute(self, cpu_count, data_size, **kwargs):
+        self.record.algorithm_name = self.algorithm_name
+        self.record.cpu_count = cpu_count
+        self.record.data_size = data_size
 
     def run(self, **configuration):
         self.record = self.record_class()
@@ -39,7 +42,7 @@ class AbstractEvaluator:
 
 
 class Logger:
-    def __init__(self, csv_file_path, field_names, iterations, configurations, evaluators):
+    def __init__(self, csv_file_path, iterations, configurations, evaluators, field_names=None):
         """
 
         :param csv_file_path:
@@ -48,10 +51,10 @@ class Logger:
         :param configurations: [{'data': [1,2,3], 'cpu_count': 1, ...}]
         """
         self.path = csv_file_path
-        self.field_names = field_names
         self.iterations = iterations
         self.configurations = configurations
         self.evaluators = evaluators
+        self.field_names = field_names if field_names else Record.field_names()
 
     def init_csv_file(self):
         with open(self.path, 'w') as fp:

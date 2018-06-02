@@ -1,7 +1,7 @@
 __author__ = 'Azat Abubakirov'
 
 import numpy as np
-
+import os
 from pathos.multiprocessing import ProcessPool as Pool
 
 from qparallel.clustering.base import Model
@@ -9,9 +9,11 @@ from qparallel.helpers import (
     get_available_cpu_count
 )
 
+import matplotlib.pyplot as plt
+
 
 class Point:
-    def __init__(self, x, y, label=0, index=None):
+    def __init__(self, x, y, label=-1, index=None):
         self.x = x
         self.y = y
         self.label = label
@@ -40,10 +42,10 @@ class DBScan(Model):
     def pre_process(self, data):
         """
 
-        :param data:
-        :return:
+        :param data: [(x1, y1), (x2, y2), ]
+        :return: [Point(x=x1, y=y2), Point(x=x2, y=y2)]
         """
-        return list(sorted(map(lambda xy: Point(*xy), data)))
+        return list(sorted(map(lambda coordinates: Point(*coordinates), data)))
 
     def _get_neighbors(self, point, points):
         return list(filter(lambda other: point.is_close(other, self.eps), points))
@@ -54,8 +56,6 @@ class DBScan(Model):
         while i < len(neighbors):
             neighbor = neighbors[i]
             if neighbor.label == -1:
-                neighbor.label = label
-            elif neighbor.label == 0:
                 neighbor.label = label
                 next_neighbors = self._get_neighbors(neighbor, points)
 
@@ -70,9 +70,10 @@ class DBScan(Model):
         :param points: sorted list of Point objects
         :return:
         """
-        label = 0
+        np.random.seed(os.getpid())
+        label = np.random.randint(-100000, 100000, size=1)[0]
         for point in points:
-            if not point.label != 0:
+            if point.label != -1:
                 continue
 
             neighbors = self._get_neighbors(point, points)
@@ -129,9 +130,9 @@ class DBScan(Model):
 
         return merged_clusters
 
-    def fit(self, data, cpu_count=-1, *args, **kwargs):
+    def fit(self, data, cpu_count=-1):
         """
-        :param data: list of 2D-points. [[1,2], [3,4], ...]
+        :param data: list of coordinates. [[1,2], [3,4], ...]
         :param cpu_count:
         :param args:
         :param kwargs:
@@ -146,3 +147,23 @@ class DBScan(Model):
 
         merged_clusters = self.merge_clusters(list(clustered_chunks))
         return merged_clusters
+
+    def plot(self, marked_points):
+        """
+
+        :param marked_points: [Point(x=x1, y=y1, label=1), Point(x=x2, y=y2, label=2)]
+        :return:
+        """
+        data = dict()
+
+        for point in marked_points:
+            if point.label in data:
+                data[point.label][0].append(point.x)
+                data[point.label][1].append(point.y)
+            else:
+                data[point.label] = [[point.x], [point.y]]
+
+        for label in data:
+            plt.scatter(x=data[label][0], y=data[label][1], c=np.random.rand(3, ))
+
+        plt.show()

@@ -41,9 +41,7 @@ class AbstractSortingEvaluator(AbstractEvaluator, AbstractSorting):
         array = configuration['array']
         cpu_count = configuration['cpu_count']
 
-        self.record.algorithm_name = self.algorithm_name
-        self.record.cpu_count = cpu_count
-        self.record.data_size = len(array)
+        super(AbstractSortingEvaluator, self)._execute(cpu_count=cpu_count, data_size=len(array))
 
         return self._estimate_execution_time(self, 'sort', 'total_time', array=array, cpu_count=cpu_count)
 
