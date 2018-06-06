@@ -1,9 +1,11 @@
 __author__ = 'Maria Khodorchenko'
 
+import numpy as np
 
-def test_split_data():
+
+def test_graph_alg():
     from qparallel.graph import Graph
 
-    graph = Graph([[0, 5], [1, 2], [2, 3], [3, 4]], n_proc=5)
-    print(graph._adjacency_matrix)
+    graph = Graph([[0, 1, 8], [0, 2, 5], [1, 0, 3], [2, 1, 2]], n_proc=4)
     graph.find_shortest_path()
+    assert graph._I == np.array([[0., 7., 5.], [3., 0., 8.], [5., 2., 0.]])

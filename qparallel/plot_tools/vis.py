@@ -22,7 +22,7 @@ def _parse_in(files):
 def plot_speedup(in_files):
     data = _parse_in(in_files)
     data["total_time"] = pd.to_datetime(data["total_time"])
-    data["time"] = data["total_time"].dt.microsecond + (1000000 * data["total_time"].dt.second)
+    data["time"] = data["total_time"].dt.microsecond + (1000000 * data["total_time"].dt.second) + (60000000 * data["total_time"].dt.minute)
     ls_names = list(data["algorithm_name"].unique())
     print(ls_names)
     for i in ls_names:
