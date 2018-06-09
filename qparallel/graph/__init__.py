@@ -1,1 +1,1 @@
-from qparallel.graph.shortestpath import Graph
+from qparallel.graph.graphalgs import Graph

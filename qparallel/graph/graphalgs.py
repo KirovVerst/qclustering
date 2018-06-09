@@ -14,7 +14,6 @@ in the form [node1, node2, weight]
 nodes are counted from 0
 """
 
-
 class Graph:
 
     def __init__(self, x, n_proc=1):
@@ -25,7 +24,6 @@ class Graph:
         self._I[self._I == 0] = np.inf
         for i in range(len(self._I)):
             self._I[i, i] = 0
-
 
     def _calculate_adjacency_matrix(self):
         i, j, w = self.data[:, 0], self.data[:, 1], self.data[:, 2]
@@ -41,13 +39,13 @@ class Graph:
         raise NotImplementedError
 
     def _shortest(self, ind, k):
-        print(ind, k)
+        # print(ind, k)
         tmp_array = [[0 for i in range(self.num_nodes)] for j in range(len(ind))]
-        #tmp_array = np.zeros(shape=(len(ind), self.num_nodes))
+        # tmp_array = np.zeros(shape=(len(ind), self.num_nodes))
         for i in range(len(ind)):
             for j in range(self.num_nodes):
-                if (self._I[ind[i]][k] != np.inf and self._I[k][j] != np.inf):
-                    tmp_array[i][j] = min(self._I[ind[i], j], self._I[ind[i], k] + self._I[k, j])
+                #if (self._I[ind[i]][k] != np.inf and self._I[k][j] != np.inf):
+                tmp_array[i][j] = min(self._I[ind[i], j], self._I[ind[i], k] + self._I[k, j])
         return tmp_array
 
     def _parallel(self, k):
@@ -56,8 +54,12 @@ class Graph:
         ind = split_data(ind_list, self.n_proc)
         with Pool(self.n_proc) as pool:
             res = list(pool.map(self._shortest, ind, k))
-        print('SELF', res)
-        return self
+        counter = 0
+        for i in res:
+            for j in i:
+                self._I[counter] = j
+                counter += 1
+
 
     def find_shortest_path(self):
         """
@@ -65,6 +67,7 @@ class Graph:
         """
         for k in range(self.num_nodes):
             self._parallel(k)
+
 
     def _coloring(self):
         pass
@@ -74,7 +77,7 @@ class Graph:
         Jones-Plassmann Coloring
         """
         rand_assign = {}
-        nodes = self.data.flatten()
+        # nodes = self.data.flatten()
         # len_nodes
         # for i in range(len(set(nodes))):
         #     random_assign[i] =
