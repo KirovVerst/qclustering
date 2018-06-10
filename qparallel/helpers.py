@@ -1,7 +1,7 @@
 __author__ = 'Azat Abubakirov'
 
 import multiprocessing
-
+import random
 
 def get_available_cpu_count(cpu_count=-1):
     max_cpu_count = multiprocessing.cpu_count()
@@ -31,5 +31,5 @@ def generate_full_graph(nodes_num):
     for i in range(nodes_num):
         for j in range(nodes_num):
             if i != j:
-                edges += [i, j]
+                edges.append([i, j, random.randint(1,10)])
     return edges

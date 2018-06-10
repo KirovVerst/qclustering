@@ -16,6 +16,11 @@ Nodes numbering should begin from 0
 """
 
 
+class AbstractGraphAlg:
+    def __init__(self):
+        self.data = None
+
+
 class Graph:
 
     def __init__(self, x, n_proc=1):
@@ -97,7 +102,6 @@ class Graph:
         Jones-Plassmann Coloring
 
         Only for undirected graphs
-
         :return: list of lists [node, color]
         """
         self.init_for_coloring()
