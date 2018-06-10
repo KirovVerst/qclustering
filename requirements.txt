@@ -10,6 +10,7 @@ idna==2.6
 mccabe==0.6.1
 more-itertools==4.1.0
 multiprocess==0.70.5
+numpy==1.14.3
 pathos==0.2.1
 pluggy==0.6.0
 pox==0.2.3

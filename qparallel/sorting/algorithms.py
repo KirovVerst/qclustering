@@ -1,44 +1,45 @@
 __author__ = 'Azat Abubakirov'
 
+from itertools import chain
+
 from pathos.multiprocessing import ProcessPool as Pool
 
 from qparallel.helpers import (
     get_available_cpu_count,
+    roundup,
     split_data
 )
 
 
 class AbstractSorting:
+    @staticmethod
+    def ascending_comparator(x, y):
+        return x < y
+
+    @staticmethod
+    def decreasing_comparator(x, y):
+        return y < x
+
     def __init__(self, **kwargs):
         self.ascending = kwargs.get('ascending', True)
 
-        def ascending_comp(x, y):
-            return x < y
-
-        def decreasing_comp(x, y):
-            return x > y
-
-        self.comparator = ascending_comp if self.ascending else decreasing_comp
+        self.comparator = self.ascending_comparator if self.ascending else self.decreasing_comparator
 
     def _sort_one_array(self, array):
         raise NotImplementedError
 
     def merge_sorted_arrays(self, sorted_arrays, cpu_count):
-        while len(sorted_arrays) > 1:
-            if len(sorted_arrays) % 2 == 1:
-                sorted_arrays.append([])
+        result_array = sorted_arrays[0]
+        index = 1
+        sorted_arrays_count = len(sorted_arrays)
 
-            arrays_pairs = list(map(lambda i: (sorted_arrays[i], sorted_arrays[i + 1]),
-                                    range(0, len(sorted_arrays), 2)))
+        while index < sorted_arrays_count:
+            result_array = self.merge_two_sorted_arrays(result_array, sorted_arrays[index])
+            index += 1
 
-            with Pool(cpu_count) as pool:
-                sorted_arrays = list(pool.map(self.merge_two_sorted_arrays, arrays_pairs))
+        return result_array
 
-        return sorted_arrays
-
-    def merge_two_sorted_arrays(self, arrays):
-        array_1, array_2 = arrays[0], arrays[1]
-
+    def merge_two_sorted_arrays(self, array_1, array_2):
         merged_array = []
 
         index_1 = 0
@@ -75,16 +76,22 @@ class AbstractSorting:
 
         return sorted_arrays
 
+    def _split_array(self, array, cpu_count):
+        return split_data(array, cpu_count)
+
     def sort(self, array, cpu_count=-1):
+        if not array:
+            return []
+
         array = list(array)
         cpu_count = get_available_cpu_count(cpu_count)
-        arrays = split_data(array, cpu_count)
+        arrays = self._split_array(array, cpu_count)
 
         sorted_arrays = self.sort_arrays(arrays, cpu_count)
 
-        merged_arrays = self.merge_sorted_arrays(sorted_arrays, cpu_count)
+        merged_array = self.merge_sorted_arrays(sorted_arrays, cpu_count)
 
-        return merged_arrays[0]
+        return merged_array
 
 
 class MergeSorting(AbstractSorting):
@@ -99,7 +106,7 @@ class MergeSorting(AbstractSorting):
         array_1 = self._sort_one_array(array[:array_size // 2])
         array_2 = self._sort_one_array(array[array_size // 2:])
 
-        return self.merge_two_sorted_arrays((array_1, array_2))
+        return self.merge_two_sorted_arrays(array_1, array_2)
 
 
 class SelectSorting(AbstractSorting):
@@ -147,3 +154,41 @@ class QuickSorting(AbstractSorting):
 
         self._quicksort(array, 0, len(array) - 1)
         return array
+
+
+class BlockSorting(AbstractSorting):
+    @classmethod
+    def _split_array(cls, array, cpu_count=-1, **kwargs):
+        step = kwargs.get('step', 10)
+
+        max_value = roundup(max(array), step)
+        min_value = roundup(min(array), step)
+
+        borders = list(range(min_value, max_value, step))
+        arrays = [[] for _ in range((max_value - min_value) // step + 1)]
+
+        for value in array:
+            added = False
+            for i, border in enumerate(borders):
+                if value <= border:
+                    arrays[i].append(value)
+                    added = True
+                    break
+            if not added:
+                arrays[-1].append(value)
+        return arrays
+
+    def merge_sorted_arrays(self, sorted_arrays, cpu_count):
+        if not self.ascending:
+            sorted_arrays = list(reversed(sorted_arrays))
+        return list(chain(*sorted_arrays))
+
+    def _sort_one_array(self, array):
+        if not array:
+            return []
+
+        arrays = self._split_array(array, step=1)
+        if not self.ascending:
+            arrays = list(reversed(arrays))
+
+        return list(chain(*arrays))
