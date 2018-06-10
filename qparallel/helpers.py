@@ -1,5 +1,6 @@
 __author__ = 'Azat Abubakirov'
 
+import math
 import multiprocessing
 
 
@@ -26,6 +27,7 @@ def split_data(data, chunks_count):
 
     return chunks
 
+
 def generate_full_graph(nodes_num):
     edges = []
     for i in range(nodes_num):
@@ -33,3 +35,8 @@ def generate_full_graph(nodes_num):
             if i != j:
                 edges += [i, j]
     return edges
+
+
+def roundup(x, step=10):
+    return int(math.ceil(x / step)) * step
+

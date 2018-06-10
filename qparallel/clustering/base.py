@@ -9,10 +9,10 @@ class Model:
     def __init__(self, cpu_count=-1, *args, **kwargs):
         self.cpu_count = cpu_count
 
-    def fit(self, data, *args, **kwargs):
+    def fit(self, data):
         raise NotImplementedError
 
-    def pre_process(self, data, *args, **kwargs):
+    def pre_process(self, data):
         return data
 
     @classmethod
