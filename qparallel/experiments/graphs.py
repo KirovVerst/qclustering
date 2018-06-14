@@ -29,7 +29,7 @@ class AbstractGraphAlgEvaluator(AbstractEvaluator, Graph):
         self.record.cpu_count = cpu_count
         self.record.data_size = len(graph)
 
-        return self._estimate_execution_time(self, 'find_shortest_path', 'total_time')
+        return self._estimate_execution_time(self, 'color_graph', 'total_time')
 
 
 class ShortestPathEvaluator(AbstractGraphAlgEvaluator, Graph):

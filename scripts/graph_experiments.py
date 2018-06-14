@@ -15,13 +15,14 @@ from qparallel.helpers import (
 )
 
 if __name__ == '__main__':
-    graph = generate_full_graph(100)
     cpus = 2
+    graph = generate_full_graph(100)
+    print(graph)
     configurations = [{'graph': graph, 'cpu_count': cpus}]
-    iterations = 10
-    evaluators = [ShortestPathEvaluator(graph, cpus)]
+    iterations = 5
+    evaluators = [ColoringEvaluator(graph, cpus)]
     logger = Logger(
-        csv_file_path=os.path.join(RESULTS_DIR_PATH, 'graph2.csv'),
+        csv_file_path=os.path.join(RESULTS_DIR_PATH, 'graph_100_coloring_2.csv'),
         evaluators=evaluators,
         configurations=configurations,
         field_names=GraphRecord.field_names(),

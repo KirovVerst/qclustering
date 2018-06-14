@@ -16,11 +16,6 @@ Nodes numbering should begin from 0
 """
 
 
-class AbstractGraphAlg:
-    def __init__(self):
-        self.data = None
-
-
 class Graph:
 
     def __init__(self, x, n_proc=1):
@@ -34,7 +29,7 @@ class Graph:
 
     def init_for_coloring(self):
         random.seed(42)
-        elems = random.sample(range(10 * self.num_nodes), 10)
+        elems = random.sample(range(10 * self.num_nodes), self.num_nodes)
         self._neigh_dict = {}
         self._node_color_dict = {}
         for i in self.data:
@@ -55,7 +50,7 @@ class Graph:
         self._adjacency_matrix = a
 
     def _shortest(self, ind, k):
-        tmp_array = [[0 for i in range(self.num_nodes)] for j in range(len(ind))]
+        tmp_array = [[0 for j in range(self.num_nodes)] for i in range(len(ind))]
         for i in range(len(ind)):
             for j in range(self.num_nodes):
                 tmp_array[i][j] = min(self._I[ind[i], j], self._I[ind[i], k] + self._I[k, j])
@@ -64,7 +59,7 @@ class Graph:
     def _parallel(self, k):
         ind_list = [i for i in range(self.num_nodes)]
         ind = split_data(ind_list, self.n_proc)
-        k = [k] * (len(ind) - 1)
+        k = [k] * (self.n_proc)
         with Pool(self.n_proc) as pool:
             res = list(pool.map(self._shortest, ind, k))
         counter = 0
@@ -72,7 +67,7 @@ class Graph:
             for j in i:
                 self._I[counter] = j
                 counter += 1
-        return self
+        # return self
 
     def find_shortest_path(self):
         """
@@ -112,10 +107,10 @@ class Graph:
             nodes_to_proc = split_data(list(u), self.n_proc)
             with Pool(self.n_proc) as pool:
                 res = list(pool.map(self._coloring, nodes_to_proc))
+            res = list(set(sum(res, [])))
             for i in res:
-                if i != []:
-                    self._node_color_dict[i[0]][1] = color
-                    del self._neigh_dict[i[0]]
+                self._node_color_dict[i][1] = color
+                del self._neigh_dict[i]
             color += 1
         coloring = {}
         for i in self._node_color_dict:

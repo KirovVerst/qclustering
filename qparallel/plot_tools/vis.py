@@ -54,5 +54,3 @@ def plot_speedup(in_files):
         plot_data = [trace]
         fig = go.Figure(data=plot_data, layout=layout)
         image.save_as(fig, filename=path_to_figure + i + '.jpeg')
-
-plot_speedup(["sorting1.csv", "sorting2.csv", "sorting4.csv", "sorting6.csv"])
