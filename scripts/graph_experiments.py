@@ -3,7 +3,6 @@ __author__ = 'Maria Khodorchenko'
 
 import os
 from qparallel.experiments.graphs import (
-    ShortestPathEvaluator,
     ColoringEvaluator,
     GraphRecord
 )

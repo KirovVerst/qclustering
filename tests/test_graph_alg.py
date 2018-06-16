@@ -1,7 +1,5 @@
 __author__ = 'Maria Khodorchenko'
 
-import numpy as np
-
 
 def test_graph_alg():
     from qparallel.graph import Graph

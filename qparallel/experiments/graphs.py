@@ -35,5 +35,6 @@ class AbstractGraphAlgEvaluator(AbstractEvaluator, Graph):
 class ShortestPathEvaluator(AbstractGraphAlgEvaluator, Graph):
     algorithm_name = 'shortest_path'
 
+
 class ColoringEvaluator(AbstractGraphAlgEvaluator, Graph):
     algorithm_name = 'coloring'
