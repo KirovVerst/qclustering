@@ -1,1 +1,1 @@
-from qparallel.random_numbers.generator import RandomGen
+from qparallel.random_numbers.generator import RandomGen  # NOQA
