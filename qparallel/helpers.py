@@ -2,6 +2,7 @@ __author__ = 'Azat Abubakirov'
 
 import math
 import multiprocessing
+import random
 
 
 def get_available_cpu_count(cpu_count=-1):
@@ -26,6 +27,15 @@ def split_data(data, chunks_count):
         left_border += current_chunk_size
 
     return chunks
+
+
+def generate_full_graph(nodes_num):
+    edges = []
+    for i in range(nodes_num):
+        for j in range(nodes_num):
+            if i != j:
+                edges.append([i, j, random.randint(1, 10)])
+    return edges
 
 
 def roundup(x, step=10):
