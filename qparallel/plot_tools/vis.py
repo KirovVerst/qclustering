@@ -1,7 +1,6 @@
 __author__ = 'Maria Khodorchenko'
 
 import plotly.graph_objs as go
-from plotly.offline import plot
 from plotly.plotly import image
 import numpy as np
 import pandas as pd
@@ -11,22 +10,23 @@ path_to_figure = 'Figures\\'
 
 
 def _parse_in(files):
-    data = pd.read_csv(RESULTS_DIR_PATH + "\\" + files[0])
+    data = pd.read_csv(RESULTS_DIR_PATH + '\\' + files[0])
     if len(files) > 1:
         for i in range(1, len(files)):
-            data_tmp = pd.read_csv(RESULTS_DIR_PATH + "\\" + files[i])
+            data_tmp = pd.read_csv(RESULTS_DIR_PATH + '\\' + files[i])
             data = data.append(data_tmp)
     return data
 
 
 def plot_speedup(in_files):
     data = _parse_in(in_files)
-    data["total_time"] = pd.to_datetime(data["total_time"])
-    data["time"] = data["total_time"].dt.microsecond + (1000000 * data["total_time"].dt.second) + (60000000 * data["total_time"].dt.minute)
-    ls_names = list(data["algorithm_name"].unique())
+    data['total_time'] = pd.to_datetime(data['total_time'])
+    seconds = 1000000 * data['total_time'].dt.second
+    minutes = 60000000 * data['total_time'].dt.minute
+    data['time'] = data['total_time'].dt.microsecond + seconds + minutes
+    ls_names = list(data['algorithm_name'].unique())
     print(ls_names)
     for i in ls_names:
-        cpu = []
         seconds = []
         arr_tmp = data.query('algorithm_name == @i').copy()
         arr_tmp = arr_tmp.groupby('cpu_count')['time'].mean()

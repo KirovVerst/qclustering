@@ -1,1 +1,1 @@
-from qparallel.graph.graphalgs import Graph
+from qparallel.graph.graphalgs import Graph  # NOQA

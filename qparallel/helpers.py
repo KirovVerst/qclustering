@@ -4,6 +4,7 @@ import math
 import multiprocessing
 import random
 
+
 def get_available_cpu_count(cpu_count=-1):
     max_cpu_count = multiprocessing.cpu_count()
     return max_cpu_count if cpu_count == -1 or cpu_count > max_cpu_count else cpu_count
@@ -33,10 +34,9 @@ def generate_full_graph(nodes_num):
     for i in range(nodes_num):
         for j in range(nodes_num):
             if i != j:
-                edges.append([i, j, random.randint(1,10)])
+                edges.append([i, j, random.randint(1, 10)])
     return edges
 
 
 def roundup(x, step=10):
     return int(math.ceil(x / step)) * step
-

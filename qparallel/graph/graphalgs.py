@@ -5,7 +5,6 @@ import numpy as np
 import random
 
 from qparallel.helpers import (
-    get_available_cpu_count,
     split_data
 )
 
